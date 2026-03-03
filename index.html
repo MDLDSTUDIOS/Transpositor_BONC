@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transpositor Elite - Banda Orquesta NC</title>
+    <style>
+        :root {
+            --primary: #FFD700; /* Oro puro para máxima visibilidad */
+            --bg: #0a0a0c;
+            --glass: rgba(255, 255, 255, 0.12);
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(circle at center, #1a1a20 0%, #050505 100%);
+            color: var(--text);
+        }
+
+        /* Logo mejorado */
+        .logo {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            margin-bottom: 15px;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+            object-fit: cover;
+            background: #222;
+        }
+
+        .main-card {
+            background: rgba(40, 40, 45, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 380px;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+
+        /* Selectores corregidos para visibilidad total */
+        .input-group { margin-bottom: 15px; text-align: left; }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px;
+            background: #ffffff !important; /* Fondo blanco siempre */
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            color: #000000 !important; /* Texto negro para contraste */
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            display: block; /* Asegura visibilidad */
+        }
+
+        /* Wheel Picker */
+        .wheel-box {
+            position: relative;
+            height: 140px;
+            margin: 15px 0;
+            overflow: hidden;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .wheel-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, #000 0%, transparent 40%, transparent 60%, #000 100%);
+            pointer-events: none; z-index: 5;
+        }
+
+        .wheel-selection {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%; height: 42px;
+            border-top: 1px solid var(--primary);
+            border-bottom: 1px solid var(--primary);
+            background: rgba(255, 215, 0, 0.05);
+            pointer-events: none;
+        }
+
+        .wheel-list {
+            list-style: none; padding: 0; margin: 0;
+            margin-top: 49px;
+            transition: transform 0.3s cubic-bezier(0.15, 0.88, 0.3, 1.1);
+        }
+
+        .wheel-item {
+            height: 42px; line-height: 42px; font-size: 1.1rem;
+            opacity: 0.3; transition: 0.2s; color: #fff;
+        }
+
+        .wheel-item.active { opacity: 1; color: var(--primary); transform: scale(1.1); font-weight: bold; }
+
+        /* Resultado */
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 20px;
+            background: #000;
+            border: 2px solid var(--primary);
+        }
+
+        #targetName { font-size: 0.75rem; color: var(--primary); letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        #res { font-size: 2.5rem; font-weight: 800; color: #fff; text-shadow: 0 0 15px var(--primary); }
+
+        /* Marca de Agua Centrada y Visible */
+        .brand-footer {
+            margin-top: 25px;
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .brand-text {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .sub-text {
+            font-size: 0.65rem;
+            color: var(--primary);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<img src="https://lh3.googleusercontent.com/sitesv/APaQ0SQSjnzErQEXPEdIW-uQ5cM_kcfyaHL3ssN_Ba8jD0_lavjQ0dNlUUZPv6v_CgDD8hKv8lvoStvm47xmFJPVD9JhH4RmdDZZOsJZr09IZYy6VsURAk5pfyUrXKfBnSKC-P8jSSYptYhk20goud83BBG0j3vB1dq5W7aIMqIWNrvVONtcajcP2w=w16383" class="logo" alt="Banda Logo">
+
+<div class="main-card">
+    <div class="input-group">
+        <label>Nota Original de:</label>
+        <select id="from" onchange="buildWheel()">
+            <option value="0">MELÓFONO EN FA</option>
+            <option value="1">ALTO SAX EN MIb</option>
+            <option value="2">TENOR SAX EN SIb</option>
+            <option value="3">XILÓFONO EN DO</option>
+            <option value="4" selected>TROMPETA EN SIb</option>
+            <option value="5">EUFONIO EN SIb</option>
+            <option value="6">TUBA EN SIb</option>
+            <option value="7">CLARINETE EN SIb</option>
+        </select>
+    </div>
+
+    <div class="wheel-box" id="wheelBox">
+        <div class="wheel-overlay"></div>
+        <div class="wheel-selection"></div>
+        <ul class="wheel-list" id="wheelList"></ul>
+    </div>
+
+    <div class="input-group">
+        <label>Transportar a:</label>
+        <select id="to" onchange="calculate()">
+            <option value="0">MELÓFONO EN FA</option>
+            <option value="1" selected>ALTO SAX EN MIb</option>
+            <option value="2">TENOR SAX EN SIb</option>
+            <option value="3">XILÓFONO EN DO</option>
+            <option value="4">TROMPETA EN SIb</option>
+            <option value="5">EUFONIO EN SIb</option>
+            <option value="6">TUBA EN SIb</option>
+            <option value="7">CLARINETE EN SIb</option>
+        </select>
+    </div>
+
+    <div class="result-container">
+        <span id="targetName">PARA ALTO SAX</span>
+        <span id="res">---</span>
+    </div>
+</div>
+
+<div class="brand-footer">
+    <span class="brand-text">BANDA ORQUESTA NUEVA CONCEPCIÓN</span>
+    <span class="sub-text">HERRAMIENTA OFICIAL</span>
+</div>
+
+<script>
+    const table = [
+        ["DO", "RE", "SOL", "FA", "SOL", "SOL", "SOL", "SOL"],
+        ["DO# / REb", "RE# / MIb", "SOL# / LAb", "FA# / SOLb", "SOL# / LAb", "SOL# / LAb", "SOL# / LAb", "SOL# / LAb"],
+        ["RE", "MI", "LA", "SOL", "LA", "LA", "LA", "LA"],
+        ["RE# / MIb", "FA", "LA# / SIb", "SOL# / LAb", "LA# / SIb", "LA# / SIb", "LA# / SIb", "LA# / SIb"],
+        ["MI", "FA# / SOLb", "SI", "LA", "SI", "SI", "SI", "SI"],
+        ["FA", "SOL", "DO", "LA# / SIb", "DO", "DO", "DO", "DO"],
+        ["FA# / SOLb", "SOL# / LAb", "DO# / REb", "SI", "DO# / REb", "DO# / REb", "DO# / REb", "DO# / REb"],
+        ["SOL", "LA", "RE", "DO", "RE", "RE", "RE", "RE"],
+        ["SOL# / LAb", "LA# / SIb", "RE# / MIb", "DO# / REb", "RE# / MIb", "RE# / MIb", "RE# / MIb", "RE# / MIb"],
+        ["LA", "SI", "MI", "RE", "MI", "MI", "MI", "MI"],
+        ["LA# / SIb", "DO", "FA", "RE# / MIb", "FA", "FA", "FA", "FA"],
+        ["SI", "DO# / REb", "FA# / SOLb", "MI", "FA# / SOLb", "FA# / SOLb", "FA# / SOLb", "FA# / SOLb"]
+    ];
+
+    let currentIdx = 0;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTick() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.03);
+    }
+
+    function buildWheel() {
+        const fromCol = document.getElementById('from').value;
+        const list = document.getElementById('wheelList');
+        list.innerHTML = '';
+        table.forEach((row, i) => {
+            const li = document.createElement('li');
+            li.className = 'wheel-item';
+            li.textContent = row[fromCol];
+            li.onclick = () => { if(currentIdx !== i) playTick(); currentIdx = i; updateWheel(); };
+            list.appendChild(li);
+        });
+        updateWheel();
+    }
+
+    function updateWheel() {
+        const list = document.getElementById('wheelList');
+        const offset = -(currentIdx * 42);
+        list.style.transform = `translateY(${offset}px)`;
+        document.querySelectorAll('.wheel-item').forEach((item, i) => {
+            item.classList.toggle('active', i === currentIdx);
+        });
+        calculate();
+    }
+
+    function calculate() {
+        const toCol = document.getElementById('to').value;
+        document.getElementById('res').textContent = table[currentIdx][toCol];
+        const name = document.getElementById('to').options[document.getElementById('to').selectedIndex].text;
+        document.getElementById('targetName').textContent = `PARA ${name}`;
+    }
+
+    document.getElementById('wheelBox').addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const oldIdx = currentIdx;
+        if (e.deltaY > 0 && currentIdx < 11) currentIdx++;
+        else if (e.deltaY < 0 && currentIdx > 0) currentIdx--;
+        if (oldIdx !== currentIdx) { playTick(); updateWheel(); }
+    }, { passive: false });
+
+    buildWheel();
+</script>
+</body>
+</html>
